@@ -66,8 +66,8 @@ Here is a preview of TrailBird AI running 100% offline in browser and terminal:
 
 ## Code
 
-<!-- Replace with your GitHub Repository link -->
-[![GitHub Repository](https://img.shields.io/badge/GitHub-TrailBird_AI-100000?style=for-the-badge&logo=github&logoColor=white)](YOUR_GITHUB_REPO_URL_HERE)
+<!-- GitHub Repository -->
+[![GitHub Repository](https://img.shields.io/badge/GitHub-TrailBird_AI-100000?style=for-the-badge&logo=github&logoColor=white)](https://github.com/satanic47/trailbird-ai)
 
 The complete source code is open-source under the MIT License:
 
