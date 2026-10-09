@@ -6,7 +6,14 @@ Built with GitHub Copilot AI Prompt Assistance for MLH Global Hack Week.
 import time
 import sys
 
-def print_slow(text, delay=0.03):
+# Ensure UTF-8 output encoding for terminal display
+if sys.platform == 'win32':
+    try:
+        sys.stdout.reconfigure(encoding='utf-8')
+    except Exception:
+        pass
+
+def print_slow(text, delay=0.015):
     for char in text:
         sys.stdout.write(char)
         sys.stdout.flush()
@@ -15,8 +22,8 @@ def print_slow(text, delay=0.03):
 
 def start_adventure():
     print("=" * 65)
-    print(" 🌲 WILDERNESS TRAIL EXPLORER — CHOOSE YOUR OWN ADVENTURE 🌲")
-    print(" (Generated with GitHub Copilot AI Assistance)")
+    print(" [WILDERNESS TRAIL EXPLORER] — CHOOSE YOUR OWN ADVENTURE")
+    print(" Built with GitHub Copilot AI Prompt Assistance")
     print("=" * 65)
     print()
 
@@ -28,22 +35,25 @@ def start_adventure():
     print("2. Quietly walk deeper into the birch grove toward the sound.")
     print("3. Sit on a mossy log and listen peacefully ('Touch Grass' mode).")
     
-    choice = input("\nEnter choice (1, 2, or 3): ").strip()
+    try:
+        choice = input("\nEnter choice (1, 2, or 3): ").strip()
+    except EOFError:
+        choice = "1"
 
     if choice == "1":
         print_slow("\n[Audio Spectrum Analyzer Active]")
         print_slow("FFT Pitch: 3400 Hz | Energy: High | Signal Match: 98.2%")
-        print_slow("🎯 IDENTIFIED: Black-capped Chickadee (Poecile atricapillus)!")
-        print_slow("💡 Action Tip: Look up 10ft into the birch forks. Put your phone in your pocket!")
-        print_slow("\n🏆 VICTORY: You successfully identified the bird using open-weight local AI!")
+        print_slow("IDENTIFIED: Black-capped Chickadee (Poecile atricapillus)!")
+        print_slow("Action Tip: Look up 10ft into the birch forks. Put your phone in your pocket!")
+        print_slow("\nVICTORY: You successfully identified the bird using open-weight local AI!")
     elif choice == "2":
         print_slow("\nAs you tread softly over pine needles, a curious Chickadee hops down to a low branch.")
         print_slow("It tilts its head, inspecting your boots, before fluttering off into the sunlight.")
-        print_slow("\n🌿 VICTORY: An unforgettable close-up bird sighting on the trail!")
+        print_slow("\nVICTORY: An unforgettable close-up bird sighting on the trail!")
     else:
         print_slow("\nYou sit back on the log, close your eyes, and listen to the forest chorus.")
         print_slow("No screens, no notifications—just pure nature.")
-        print_slow("\n🧘 TOUCH GRASS VICTORY: You achieved 100% wilderness zen!")
+        print_slow("\nTOUCH GRASS VICTORY: You achieved 100% wilderness zen!")
 
     print("\n" + "=" * 65)
     print("Thanks for playing Wilderness Trail Explorer! (Powered by Copilot & TrailBird AI)")
