@@ -1,0 +1,7 @@
+# Codeowners configuration for repository management
+# Assign responsibility of code areas to maintainers
+
+*       @satanic47
+*.py    @satanic47
+*.js    @satanic47
+/.github/ @satanic47
