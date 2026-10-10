@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Tip & Bill Splitter | Built with Cursor AI</title>
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --text-color: #f8fafc;
+            --accent-color: #38bdf8;
+            --accent-hover: #0284c7;
+            --input-bg: #334155;
+            --border-color: #475569;
+            --success-color: #4ade80;
+        }
+
+        .light-mode {
+            --bg-color: #f1f5f9;
+            --card-bg: #ffffff;
+            --text-color: #0f172a;
+            --accent-color: #2563eb;
+            --accent-hover: #1d4ed8;
+            --input-bg: #f8fafc;
+            --border-color: #cbd5e1;
+            --success-color: #16a34a;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            width: 100%;
+            max-width: 480px;
+            padding: 28px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .header h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .toggle-btn {
+            background: none;
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            padding: 8px 12px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.85rem;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            font-size: 0.9rem;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        input[type="number"], select {
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            background-color: var(--input-bg);
+            color: var(--text-color);
+            font-size: 1rem;
+            outline: none;
+        }
+
+        .preset-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .btn-tip {
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            background-color: var(--input-bg);
+            color: var(--text-color);
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .btn-tip.active {
+            background-color: var(--accent-color);
+            color: #ffffff;
+            border-color: var(--accent-color);
+        }
+
+        .result-card {
+            background-color: var(--input-bg);
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 24px;
+            border: 1px solid var(--border-color);
+        }
+
+        .result-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            font-size: 1rem;
+        }
+
+        .result-row.total {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--success-color);
+            border-top: 1px dashed var(--border-color);
+            padding-top: 12px;
+            margin-bottom: 0;
+        }
+
+        .badge {
+            display: inline-block;
+            background-color: var(--accent-color);
+            color: white;
+            font-size: 0.75rem;
+            padding: 4px 8px;
+            border-radius: 12px;
+            margin-top: 12px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <h1>⚡ Tip & Bill Splitter</h1>
+        <button class="toggle-btn" id="themeToggle">☀️ Light Mode</button>
+    </div>
+
+    <div class="form-group">
+        <label for="billAmount">Bill Amount ($)</label>
+        <input type="number" id="billAmount" placeholder="e.g. 85.50" min="0" step="0.01">
+    </div>
+
+    <div class="form-group">
+        <label>Select Tip Percentage</label>
+        <div class="preset-grid">
+            <button class="btn-tip" data-tip="10">10%</button>
+            <button class="btn-tip active" data-tip="15">15%</button>
+            <button class="btn-tip" data-tip="20">20%</button>
+            <button class="btn-tip" data-tip="25">25%</button>
+        </div>
+        <input type="number" id="customTip" placeholder="Custom Tip %" min="0" step="1">
+    </div>
+
+    <div class="form-group">
+        <label for="numPeople">Number of People</label>
+        <input type="number" id="numPeople" value="1" min="1" step="1">
+    </div>
+
+    <div class="result-card">
+        <div class="result-row">
+            <span>Tip Amount:</span>
+            <span id="tipAmount">$0.00</span>
+        </div>
+        <div class="result-row">
+            <span>Total Bill:</span>
+            <span id="totalBill">$0.00</span>
+        </div>
+        <div class="result-row total">
+            <span>Amount Per Person:</span>
+            <span id="perPerson">$0.00</span>
+        </div>
+    </div>
+
+    <div style="text-align: center;">
+        <span class="badge">Built with Cursor AI</span>
+    </div>
+</div>
+
+<script>
+    const billInput = document.getElementById('billAmount');
+    const customTipInput = document.getElementById('customTip');
+    const numPeopleInput = document.getElementById('numPeople');
+    const tipBtnGrid = document.querySelectorAll('.btn-tip');
+    const themeToggle = document.getElementById('themeToggle');
+
+    const tipAmountDisplay = document.getElementById('tipAmount');
+    const totalBillDisplay = document.getElementById('totalBill');
+    const perPersonDisplay = document.getElementById('perPerson');
+
+    let selectedTipPercent = 15;
+
+    // Theme Toggle
+    themeToggle.addEventListener('click', () => {
+        document.body.classList.toggle('light-mode');
+        const isLight = document.body.classList.contains('light-mode');
+        themeToggle.textContent = isLight ? '🌙 Dark Mode' : '☀️ Light Mode';
+    });
+
+    // Tip Preset Buttons
+    tipBtnGrid.forEach(btn => {
+        btn.addEventListener('click', () => {
+            tipBtnGrid.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            selectedTipPercent = parseFloat(btn.dataset.tip);
+            customTipInput.value = '';
+            calculate();
+        });
+    });
+
+    // Custom Tip Input
+    customTipInput.addEventListener('input', () => {
+        tipBtnGrid.forEach(b => b.classList.remove('active'));
+        selectedTipPercent = parseFloat(customTipInput.value) || 0;
+        calculate();
+    });
+
+    // Event Listeners for Live Calculation
+    [billInput, numPeopleInput].forEach(input => {
+        input.addEventListener('input', calculate);
+    });
+
+    function calculate() {
+        const bill = parseFloat(billInput.value) || 0;
+        const people = parseInt(numPeopleInput.value) || 1;
+
+        const tipTotal = bill * (selectedTipPercent / 100);
+        const grandTotal = bill + tipTotal;
+        const amountPerPerson = grandTotal / Math.max(people, 1);
+
+        tipAmountDisplay.textContent = `$${tipTotal.toFixed(2)}`;
+        totalBillDisplay.textContent = `$${grandTotal.toFixed(2)}`;
+        perPersonDisplay.textContent = `$${amountPerPerson.toFixed(2)}`;
+    }
+
+    calculate();
+</script>
+</body>
+</html>
