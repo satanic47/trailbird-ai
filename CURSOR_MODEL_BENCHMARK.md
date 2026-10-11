@@ -1,40 +1,61 @@
-# Benchmark Cursor's Models: Performance & Comparison Report
+# Benchmark Cursor's Models: Grok 4.7 High vs Claude Opus 5.5 Medium
 
-## 🎯 Test Prompt Used Across All Models
-> "Write an optimized Python module to compute the Fibonacci sequence up to N elements using 3 paradigms (Memoization, Dynamic Programming, and Generators), including Big-O time/space complexity analysis and unit tests."
-
----
-
-## 📊 Model Comparison & Benchmarking Results
-
-### 1. Claude 3.5 Sonnet (Anthropic)
-- **Response Speed**: ⚡⚡⚡ (Medium - ~2.5 seconds)
-- **Code Quality**: ⭐⭐⭐⭐⭐ (5/5)
-- **Pros**:
-  - Exceptionally clean Pythonic code with comprehensive type annotations and docstrings.
-  - Provided exact time and space complexity bounds ($O(N)$ time, $O(1)$ space for DP).
-  - Wrote robust unit tests covering boundary conditions ($N=0, N=1$, negative inputs).
-- **Cons**: Slightly slower generation latency compared to lightweight models.
-
-### 2. GPT-4o (OpenAI)
-- **Response Speed**: ⚡⚡⚡⚡ (Fast - ~1.8 seconds)
-- **Code Quality**: ⭐⭐⭐⭐ (4.5/5)
-- **Pros**:
-  - Very quick output generation with clear markdown formatting.
-  - Included edge case validation and comprehensive error handling.
-- **Cons**: Added slightly more verbose explanatory text than necessary.
-
-### 3. Cursor Small / Composer (Cursor Native Model)
-- **Response Speed**: ⚡⚡⚡⚡⚡ (Ultra Fast - ~0.6 seconds)
-- **Code Quality**: ⭐⭐⭐⭐ (4/5)
-- **Pros**:
-  - Near-instant response time for inline code generation and file edits.
-  - Zero lag when scaffolding code directly into workspace files.
-- **Cons**: Less detailed mathematical breakdown of asymptotic bounds compared to Sonnet.
+Comprehensive benchmarking and model comparison conducted in **Cursor Pro** evaluating **Grok 4.7 High** and **Claude Opus 5.5 Medium**.
 
 ---
 
-## 🔗 Submission References
-- **Repository Code**: [cursor_model_benchmark.py](https://github.com/satanic47/trailbird-ai/blob/main/cursor_model_benchmark.py)
-- **Benchmark Guide**: [CURSOR_MODEL_BENCHMARK.md](https://github.com/satanic47/trailbird-ai/blob/main/CURSOR_MODEL_BENCHMARK.md)
+## 🎯 Test Prompt Used in Cursor Pro
+
+```bash
+brew install tigerdata/tap/tiger
+go install github.com/tigerdata/tiger-cli@latest
+```
+
+```json
+{
+  "mcpServers": {
+    "tiger-cloud": {
+      "command": "tiger",
+      "args": ["mcp"],
+      "env": {
+        "TIGER_API_KEY": "YOUR_TIGER_CLOUD_API_KEY"
+      }
+    }
+  }
+}
+```
+*Prompt:* **"Explain what this does."**
+
+---
+
+## 📊 Model Comparison & Detailed Pros / Cons
+
+### 1. Grok 4.7 High
+- **Analysis Depth**: ⭐⭐⭐⭐⭐ (5/5)
+- **Technical Accuracy**: ⭐⭐⭐⭐⭐ (5/5)
+- **Pros**:
+  - **Identified breaking changes & up-to-date CLI specifics**: Specifically caught that the current Tiger CLI uses `tiger mcp start` and `TIGER_PUBLIC_KEY`/`TIGER_SECRET_KEY` instead of `TIGER_API_KEY`.
+  - **Platform-aware**: Immediately recognized the Windows environment and provided the native PowerShell installer (`irm https://cli.tigerdata.com/install.ps1 | iex`).
+  - **Actionable tips**: Pointed out the automatic `tiger mcp install cursor` helper command.
+- **Cons**: Slightly technical output density that might be overwhelming for complete beginners.
+
+### 2. Claude Opus 5.5 Medium
+- **Clarity & Readability**: ⭐⭐⭐⭐⭐ (5/5)
+- **Pedagogical Structure**: ⭐⭐⭐⭐⭐ (5/5)
+- **Pros**:
+  - **Super clean architectural breakdown**: Clearly explains what MCP (Model Context Protocol) is, why it's useful, and what capabilities it gives the AI agent.
+  - **Pragmatic security warnings**: Explicitly warns to keep the API key out of git commits and `.gitignore` the file.
+  - **Beginner-friendly**: Great formatting with easy-to-read section headings and bullet points.
+- **Cons**: Did not point out the latest CLI command syntax updates (`tiger mcp start` vs `tiger mcp`).
+
+---
+
+## 🏆 Conclusion & Recommendation
+- Use **Grok 4.7 High** when you need cutting-edge documentation accuracy, platform-specific install scripts (Windows/PowerShell), and deep technical debugging.
+- Use **Claude Opus 5.5 Medium** when you need clean high-level architecture explanations, clear documentation formatting, and best practices.
+
+---
+
+## 🔗 Submission Details
+- **Repository**: [satanic47/trailbird-ai](https://github.com/satanic47/trailbird-ai)
 - **Challenge Page**: [Benchmark Cursor's Models](https://www.mlh.com/events/global-hack-week-open-source-90/challenges/01a11d25-134c-17e5-e22c-8af278534580)
