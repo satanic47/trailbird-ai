@@ -2,28 +2,24 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TrailBird AI — Zero-Signal Offline Bird Call Identifier</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>TrailBird AI — Avian Pokédex (2,800+ Species)</title>
   <link rel="stylesheet" href="styles.css">
-  <!-- Tailwind CSS CDN for styling & responsive layout -->
+  <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
       theme: {
         extend: {
           colors: {
-            forest: {
-              900: '#0c1e17',
-              800: '#142e24',
-              700: '#1b3f31',
-              600: '#275844',
-              500: '#34745a',
-              400: '#489c7b',
-              300: '#6ec2a1',
-              100: '#d1f2e4'
-            },
-            amber: {
-              gold: '#f5b726'
+            pokedex: {
+              red: '#dc2626',
+              dark: '#991b1b',
+              bezel: '#0f172a',
+              screen: '#030712',
+              cyan: '#06b6d4',
+              amber: '#f59e0b',
+              emerald: '#10b981'
             }
           }
         }
@@ -31,174 +27,359 @@
     }
   </script>
 </head>
-<body class="bg-forest-900 text-slate-100 min-h-screen font-sans selection:bg-forest-500 selection:text-white pb-16">
+<body class="bg-slate-950 text-slate-100 h-screen w-screen overflow-hidden flex items-center justify-center p-2 sm:p-4 select-none">
 
-  <!-- Top Navigation & Offline Status Header -->
-  <header class="border-b border-forest-700 bg-forest-800/80 backdrop-blur sticky top-0 z-40">
-    <div class="max-w-6xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-4">
+  <!-- Main Pokédex Chassis Container (Fits completely in screen with zero page scrolling) -->
+  <div class="w-full max-w-7xl h-[98vh] sm:h-[95vh] bg-gradient-to-br from-red-600 via-red-700 to-red-900 rounded-3xl p-3 sm:p-5 shadow-2xl border-4 border-red-950 flex flex-col justify-between relative overflow-hidden">
+    
+    <!-- Decorative Corner Screws & Hinge Lines -->
+    <div class="absolute top-2 left-2 w-3 h-3 rounded-full bg-slate-300 border border-slate-600 shadow-inner flex items-center justify-center text-[8px] text-slate-700 font-bold">+</div>
+    <div class="absolute top-2 right-2 w-3 h-3 rounded-full bg-slate-300 border border-slate-600 shadow-inner flex items-center justify-center text-[8px] text-slate-700 font-bold">+</div>
+    <div class="absolute bottom-2 left-2 w-3 h-3 rounded-full bg-slate-300 border border-slate-600 shadow-inner flex items-center justify-center text-[8px] text-slate-700 font-bold">+</div>
+    <div class="absolute bottom-2 right-2 w-3 h-3 rounded-full bg-slate-300 border border-slate-600 shadow-inner flex items-center justify-center text-[8px] text-slate-700 font-bold">+</div>
+
+    <!-- 1. TOP HEADING BAR -->
+    <header class="w-full bg-slate-900/90 backdrop-blur border border-slate-700/80 rounded-2xl px-4 py-2 sm:py-2.5 flex items-center justify-between shadow-lg shrink-0 mb-2 sm:mb-3">
+      <!-- Title & Main Camera Lens Indicator -->
       <div class="flex items-center gap-3">
-        <div class="w-10 h-10 rounded-xl bg-forest-600 flex items-center justify-center text-2xl shadow-lg border border-forest-400/30">
-          🌲
+        <!-- Iconic Pokédex Sensor Lens -->
+        <div class="relative flex items-center justify-center">
+          <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-cyan-400 border-2 border-white led-glow-blue flex items-center justify-center shadow-lg">
+            <div class="w-3 h-3 sm:w-4 sm:h-4 rounded-full bg-cyan-100 opacity-80 animate-ping"></div>
+          </div>
+          <!-- Tri-color Sensor LEDs -->
+          <div class="flex gap-1.5 ml-2.5">
+            <span class="w-2.5 h-2.5 rounded-full bg-red-500 led-glow-red"></span>
+            <span class="w-2.5 h-2.5 rounded-full bg-yellow-400 led-glow-amber"></span>
+            <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 led-glow-green"></span>
+          </div>
         </div>
+
         <div>
-          <h1 class="font-bold text-lg leading-tight text-white flex items-center gap-2">
-            TrailBird <span class="bg-forest-600 text-forest-100 text-xs px-2 py-0.5 rounded font-mono border border-forest-400/30">AI</span>
+          <h1 class="font-pokedex font-bold text-lg sm:text-2xl tracking-wider text-white uppercase flex items-center gap-2">
+            TrailBird AI <span class="bg-cyan-500 text-slate-950 text-xs px-2 py-0.5 rounded-md font-mono font-bold tracking-normal">POKÉDEX</span>
           </h1>
-          <p class="text-xs text-forest-300">Open-Source AI Bird Call Identifier for Wilderness Trails</p>
+          <p class="text-[10px] sm:text-xs text-slate-300 font-medium hidden sm:block">
+            Autonomous Wildlife Identifier • eBird, Macaulay Library & Xeno-canto
+          </p>
         </div>
       </div>
 
-      <div class="flex items-center gap-3 text-xs">
-        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-950/80 border border-emerald-500/40 text-emerald-400 font-mono font-medium">
-          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-          100% OFFLINE (NO SIGNAL)
+      <!-- Quick Metrics & Status Badges -->
+      <div class="flex items-center gap-2 sm:gap-3 text-xs">
+        <span class="bg-slate-800 border border-slate-700 text-cyan-400 px-2.5 py-1 rounded-lg font-mono font-semibold flex items-center gap-1.5 shadow-inner">
+          <span class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
+          <span id="headerTotalSpecies">2,867</span> <span class="hidden md:inline">Birds</span>
         </span>
-        <button id="touchGrassHeaderBtn" class="bg-amber-gold hover:bg-yellow-400 text-forest-900 font-bold px-3 py-1.5 rounded-lg shadow text-xs flex items-center gap-1.5 transition transform active:scale-95">
-          <span>🌿</span> Touch Grass Mode
+        <button id="pokedexDirBtn" class="bg-red-700 hover:bg-red-600 text-white font-bold px-3 py-1 rounded-lg border border-red-500 shadow transition flex items-center gap-1 active:scale-95 text-xs">
+          <span>📖</span> <span class="hidden sm:inline">Directory</span>
         </button>
       </div>
-    </div>
-  </header>
+    </header>
 
-  <!-- Main Container -->
-  <main class="max-w-6xl mx-auto px-4 pt-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
+    <!-- 2. SCREEN DIVIDED INTO 2 PARTS (Left: Media Player | Right: Text Info + Buttons) -->
+    <!-- On landscape/desktop: 2 columns. On portrait/mobile: stacked vertically (Heading -> Player -> Text -> Buttons) -->
+    <div class="flex-grow grid grid-cols-1 md:grid-cols-12 gap-2 sm:gap-4 min-h-0 overflow-hidden pokedex-layout">
 
-    <!-- Left Column: Audio Recording & Spectrogram (7 cols) -->
-    <section class="lg:col-span-7 space-y-6">
-      
-      <!-- Audio Capture Card -->
-      <div class="bg-forest-800/60 border border-forest-700 rounded-2xl p-6 shadow-xl relative overflow-hidden">
-        <div class="flex items-center justify-between mb-4">
-          <h2 class="text-lg font-bold text-white flex items-center gap-2">
-            <span>🎤</span> Audio Capture & Spectrogram
-          </h2>
-          <span class="text-xs text-forest-300 font-mono">Web Audio API • Local FFT</span>
+      <!-- ================= LEFT SCREEN: PLAYER FOR AUDIO / VIDEO & IMAGES ================= -->
+      <div class="md:col-span-6 lg:col-span-6 bg-slate-950/95 border-2 border-slate-800 rounded-2xl p-2 sm:p-3 shadow-inner flex flex-col justify-between overflow-hidden relative pokedex-screen">
+        
+        <!-- Player Mode Header Tabs -->
+        <div class="flex items-center justify-between border-b border-slate-800 pb-1.5 mb-2 shrink-0">
+          <div class="flex items-center gap-1 sm:gap-1.5 text-xs font-mono">
+            <button id="tabSlideshowBtn" class="px-2.5 py-1 rounded-lg font-bold bg-cyan-600 text-white transition flex items-center gap-1 shadow">
+              <span>🖼️</span> <span>Photos (<span id="slideCountTotal">3</span>)</span>
+            </button>
+            <button id="tabAudioBtn" class="px-2.5 py-1 rounded-lg font-bold bg-slate-800 hover:bg-slate-700 text-slate-300 transition flex items-center gap-1">
+              <span>🎵</span> <span>Voice Player</span>
+            </button>
+            <button id="tabVideoBtn" class="px-2.5 py-1 rounded-lg font-bold bg-slate-800 hover:bg-slate-700 text-slate-300 transition flex items-center gap-1">
+              <span>🎬</span> <span>Video</span>
+            </button>
+          </div>
+          <!-- Live Status Indicator -->
+          <span id="playerStatusBadge" class="text-[11px] font-mono text-cyan-400 bg-cyan-950/60 border border-cyan-800/60 px-2 py-0.5 rounded">
+            READY
+          </span>
         </div>
 
-        <!-- Live Canvas Spectrogram / Waveform -->
-        <div class="relative bg-forest-950 rounded-xl border border-forest-700 h-48 overflow-hidden flex items-center justify-center">
-          <canvas id="spectrogramCanvas" class="w-full h-full block"></canvas>
+        <!-- Media Display Viewport (Flexible height, centered media) -->
+        <div class="flex-grow relative rounded-xl bg-black border border-slate-800/80 overflow-hidden flex items-center justify-center min-h-0">
           
-          <div id="canvasPlaceholder" class="absolute inset-0 flex flex-col items-center justify-center text-center p-4 bg-forest-950/90">
-            <span class="text-4xl mb-2">🎵</span>
-            <p class="text-sm text-forest-300 font-medium">Ready to record live trail audio or load a sample</p>
-            <p class="text-xs text-slate-400 mt-1">Local open-weight feature extraction runs 100% in your browser</p>
-          </div>
+          <!-- VIEW 1: SINGLE-SCREEN PHOTO SLIDESHOW (At least 3 realistic images) -->
+          <div id="slideshowView" class="w-full h-full relative flex items-center justify-center">
+            <!-- Main Photo -->
+            <img id="slideshowImg" src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b8/Turdus-migratorius-002.jpg/800px-Turdus-migratorius-002.jpg" alt="Bird Photo" class="w-full h-full object-contain slide-fade rounded-lg">
+            
+            <!-- Fallback Canvas if Offline/Image Blocked -->
+            <canvas id="slideshowCanvas" class="hidden w-full h-full"></canvas>
 
-          <div id="recordingIndicator" class="hidden absolute top-3 right-3 bg-red-600/90 text-white text-xs px-3 py-1 rounded-full font-mono flex items-center gap-2 shadow animate-pulse">
-            <span class="w-2 h-2 rounded-full bg-white"></span> RECORDING TRAIL AUDIO...
-          </div>
-        </div>
-
-        <!-- Control Buttons -->
-        <div class="mt-5 grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <button id="recordBtn" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 px-4 rounded-xl shadow-lg transition flex items-center justify-center gap-2 active:scale-98">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"></path></svg>
-            <span>Record Trail Call (3s)</span>
-          </button>
-
-          <label for="audioFileInput" class="cursor-pointer bg-forest-700 hover:bg-forest-600 text-slate-100 font-semibold py-3 px-4 rounded-xl shadow transition flex items-center justify-center gap-2 border border-forest-600 text-center">
-            <svg class="w-5 h-5 text-forest-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
-            <span>Upload WAV / MP3</span>
-            <input type="file" id="audioFileInput" accept="audio/*" class="hidden">
-          </label>
-        </div>
-
-        <!-- Preloaded Trail Samples for Quick Test -->
-        <div class="mt-5 pt-4 border-t border-forest-700/60">
-          <p class="text-xs font-semibold text-forest-300 uppercase tracking-wider mb-2">Instant Test Samples (Offline Dataset):</p>
-          <div class="flex flex-wrap gap-2">
-            <button class="sample-btn text-xs bg-forest-900/80 hover:bg-forest-700 text-forest-200 px-3 py-1.5 rounded-lg border border-forest-700 transition" data-sample="american_robin.wav">
-              🐦 American Robin
+            <!-- Previous / Next Overlay Controls -->
+            <button id="prevSlideBtn" class="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-slate-900/70 hover:bg-slate-800 text-white flex items-center justify-center border border-slate-600 shadow transition active:scale-95 text-sm z-10">
+              ❮
             </button>
-            <button class="sample-btn text-xs bg-forest-900/80 hover:bg-forest-700 text-forest-200 px-3 py-1.5 rounded-lg border border-forest-700 transition" data-sample="northern_cardinal.wav">
-              🔴 Northern Cardinal
+            <button id="nextSlideBtn" class="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-slate-900/70 hover:bg-slate-800 text-white flex items-center justify-center border border-slate-600 shadow transition active:scale-95 text-sm z-10">
+              ❯
             </button>
-            <button class="sample-btn text-xs bg-forest-900/80 hover:bg-forest-700 text-forest-200 px-3 py-1.5 rounded-lg border border-forest-700 transition" data-sample="black_capped_chickadee.wav">
-              🐤 Chickadee
-            </button>
-            <button class="sample-btn text-xs bg-forest-900/80 hover:bg-forest-700 text-forest-200 px-3 py-1.5 rounded-lg border border-forest-700 transition" data-sample="blue_jay.wav">
-              🦅 Blue Jay
-            </button>
-          </div>
-        </div>
 
-      </div>
-
-      <!-- Touch Grass Banner (Gets people off screen!) -->
-      <div class="bg-amber-500/10 border-2 border-amber-500/40 rounded-2xl p-5 shadow-lg relative overflow-hidden">
-        <div class="flex items-start gap-4">
-          <div class="text-3xl p-2 bg-amber-500/20 rounded-xl text-amber-400">🌿</div>
-          <div>
-            <h3 class="font-bold text-amber-300 text-base">Touch Grass Ethos: Make the screen the shortest step!</h3>
-            <p class="text-xs text-amber-200/90 mt-1 leading-relaxed">
-              TrailBird AI processes audio in <strong>&lt;15ms</strong> directly on device so you don't spend your trail hike staring at a glass rectangle. Get your identification, put your phone in your pocket, and look up!
-            </p>
-            <button id="pocketPhoneBtn" class="mt-3 bg-amber-gold text-forest-950 font-extrabold text-xs px-4 py-2 rounded-lg shadow hover:bg-yellow-400 transition flex items-center gap-2">
-              <span>📱</span> Put Phone in Pocket (Activate Listening Mode)
-            </button>
-          </div>
-        </div>
-      </div>
-
-    </section>
-
-    <!-- Right Column: Identification Results & Species Card (5 cols) -->
-    <section class="lg:col-span-5 space-y-6">
-      
-      <div class="bg-forest-800/60 border border-forest-700 rounded-2xl p-6 shadow-xl relative min-h-[460px]">
-        <h2 class="text-lg font-bold text-white flex items-center justify-between mb-4">
-          <span class="flex items-center gap-2">🎯 Offline Identification</span>
-          <span id="latencyBadge" class="text-xs font-mono text-forest-400 bg-forest-900 px-2.5 py-1 rounded-full border border-forest-700 hidden">14ms latency</span>
-        </h2>
-
-        <div id="resultsContainer">
-          <!-- Initial State -->
-          <div class="text-center py-16 px-4">
-            <div class="w-16 h-16 rounded-full bg-forest-900 flex items-center justify-center text-3xl mx-auto mb-3 text-forest-400 border border-forest-700">
-              🔍
+            <!-- Bottom Slide Counter & Dot Indicators -->
+            <div class="absolute bottom-2 inset-x-0 flex items-center justify-center gap-2 z-10 bg-gradient-to-t from-black/80 to-transparent py-1.5">
+              <span id="slideIndicatorBadge" class="bg-slate-900/90 text-cyan-300 font-mono text-xs px-2 py-0.5 rounded border border-slate-700 shadow">
+                Slide 1 / 3
+              </span>
+              <div id="slideDotsContainer" class="flex items-center gap-1.5">
+                <span class="w-2.5 h-2.5 rounded-full bg-cyan-400 cursor-pointer"></span>
+                <span class="w-2.5 h-2.5 rounded-full bg-slate-600 cursor-pointer"></span>
+                <span class="w-2.5 h-2.5 rounded-full bg-slate-600 cursor-pointer"></span>
+              </div>
             </div>
-            <h3 class="font-bold text-slate-200">No Audio Analyzed Yet</h3>
-            <p class="text-xs text-forest-300 mt-1 max-w-xs mx-auto">Record a bird call or pick a test sample on the left to run local open-weight inference.</p>
           </div>
+
+          <!-- VIEW 2: RUNNING AUDIO FILE & WAVEFORM SPECTROGRAM -->
+          <div id="audioPlayerView" class="hidden w-full h-full p-3 flex flex-col justify-between bg-slate-950">
+            <!-- Spectrogram / Oscilloscope Canvas -->
+            <div class="flex-grow w-full relative bg-slate-900/90 rounded-lg border border-slate-800 flex items-center justify-center overflow-hidden min-h-0">
+              <canvas id="waveformCanvas" class="w-full h-full block"></canvas>
+              
+              <!-- Frequency overlay badge -->
+              <div class="absolute top-2 left-2 bg-slate-950/80 border border-slate-700 px-2 py-0.5 rounded text-[10px] font-mono text-cyan-400">
+                Peak: <span id="audioPeakHz">3,100 Hz</span>
+              </div>
+              <div id="audioPlayingPill" class="hidden absolute top-2 right-2 bg-emerald-950/80 border border-emerald-600 text-emerald-300 px-2 py-0.5 rounded text-[10px] font-mono flex items-center gap-1.5 animate-pulse">
+                <span class="w-2 h-2 rounded-full bg-emerald-400"></span> VOICE RUNNING
+              </div>
+            </div>
+
+            <!-- Audio Playback Controls -->
+            <div class="mt-2 bg-slate-900 border border-slate-800 rounded-xl p-2.5 flex items-center gap-3 shrink-0">
+              <button id="audioPlayPauseBtn" class="w-10 h-10 rounded-full bg-cyan-600 hover:bg-cyan-500 text-white font-bold flex items-center justify-center shadow-lg active:scale-95 transition shrink-0">
+                <span id="playPauseIcon" class="text-base">▶</span>
+              </button>
+              <div class="flex-grow">
+                <div class="flex items-center justify-between text-[11px] font-mono text-slate-300 mb-1">
+                  <span id="audioCurrentTime">00:00</span>
+                  <span id="audioTrackName" class="text-cyan-400 font-semibold truncate max-w-[150px]">American Robin Call</span>
+                  <span id="audioDuration">00:03</span>
+                </div>
+                <!-- Progress Bar -->
+                <div id="audioProgressBar" class="w-full h-2 bg-slate-800 rounded-full overflow-hidden cursor-pointer border border-slate-700">
+                  <div id="audioProgressFill" class="h-full bg-cyan-500 w-0 transition-all duration-100"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- VIEW 3: VIDEO CLIP PLAYER -->
+          <div id="videoPlayerView" class="hidden w-full h-full p-2 flex flex-col justify-center items-center bg-black">
+            <video id="pokedexVideoPlayer" class="w-full h-full max-h-full object-contain rounded-lg" controls playsinline></video>
+            <div id="videoEmptyPrompt" class="text-center p-4">
+              <span class="text-3xl mb-1 block">📹</span>
+              <p class="text-xs text-slate-300">Submit a 5-second bird video clip to analyze & play</p>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Media Footer Status Bar -->
+        <div class="mt-2 pt-1.5 border-t border-slate-800/80 flex items-center justify-between text-[11px] font-mono text-slate-400 shrink-0">
+          <span class="flex items-center gap-1">
+            <span>📡</span> <span id="sightingLocation">Trail Edge • Live FFT</span>
+          </span>
+          <span class="text-emerald-400 font-semibold flex items-center gap-1">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+            <span id="detectionConfidence">Confidence: 98.4%</span>
+          </span>
         </div>
 
       </div>
 
-      <!-- Offline Sighting Journal Log -->
-      <div class="bg-forest-800/60 border border-forest-700 rounded-2xl p-5 shadow-xl">
-        <div class="flex items-center justify-between mb-3">
-          <h3 class="font-bold text-sm text-white flex items-center gap-2">
-            <span>📓</span> Trail Sighting Log
-          </h3>
-          <span id="journalCount" class="text-xs text-forest-300 bg-forest-900 px-2 py-0.5 rounded font-mono">0 sightings</span>
+
+      <!-- ================= RIGHT SCREEN: DIVIDED INTO 2 PARTS ================= -->
+      <div class="md:col-span-6 lg:col-span-6 flex flex-col gap-2 sm:gap-3 min-h-0 overflow-hidden">
+        
+        <!-- UPPER PART: TEXT INFORMATION (Scrollable inside box, styled Pokédex Card) -->
+        <div class="flex-grow bg-slate-900/90 border-2 border-slate-800 rounded-2xl p-3 sm:p-4 shadow-xl overflow-y-auto scrollable-info min-h-0">
+          
+          <!-- Pokédex ID Badge & Species Common Name -->
+          <div class="flex items-start justify-between gap-2 border-b border-slate-800 pb-2 mb-2">
+            <div>
+              <div class="flex items-center gap-2 mb-0.5">
+                <span id="pokedexIdBadge" class="bg-red-700/80 border border-red-500 text-white font-mono font-bold text-xs px-2 py-0.5 rounded">
+                  #0042
+                </span>
+                <span id="orderBadge" class="bg-slate-800 text-slate-300 font-mono text-[11px] px-2 py-0.5 rounded border border-slate-700">
+                  Passeriformes
+                </span>
+              </div>
+              <h2 id="birdCommonName" class="text-xl sm:text-2xl font-bold text-white tracking-wide font-pokedex">
+                American Robin
+              </h2>
+              <p id="birdScientificName" class="text-xs sm:text-sm text-cyan-400 italic font-serif">
+                Turdus migratorius
+              </p>
+            </div>
+            
+            <!-- IUCN Conservation Status Pill -->
+            <div id="conservationPill" class="text-right shrink-0">
+              <span class="inline-block bg-emerald-950/80 border border-emerald-500 text-emerald-400 font-mono font-bold text-[10px] sm:text-xs px-2.5 py-1 rounded-full shadow">
+                Least Concern (LC)
+              </span>
+            </div>
+          </div>
+
+          <!-- Family & Species Specifics -->
+          <div class="grid grid-cols-2 gap-2 text-xs font-mono mb-3">
+            <div class="bg-slate-950/60 p-2 rounded-lg border border-slate-800">
+              <span class="text-slate-400 block text-[10px] uppercase">Family</span>
+              <span id="birdFamily" class="text-slate-200 font-bold font-sans text-xs">Turdidae (Thrushes)</span>
+            </div>
+            <div class="bg-slate-950/60 p-2 rounded-lg border border-slate-800">
+              <span class="text-slate-400 block text-[10px] uppercase">Acoustic Range</span>
+              <span id="birdFreqRange" class="text-cyan-300 font-bold font-mono text-xs">2.2 kHz – 3.8 kHz</span>
+            </div>
+          </div>
+
+          <!-- Voice / Song Description Section -->
+          <div class="mb-3 bg-slate-950/80 p-2.5 rounded-xl border border-slate-800">
+            <h3 class="text-xs font-bold text-amber-400 flex items-center gap-1.5 mb-1 font-mono uppercase">
+              <span>🔊</span> Voice & Call Pattern
+            </h3>
+            <p id="birdVoicePattern" class="text-xs text-slate-200 leading-relaxed font-sans">
+              "Cheerily, cheer up, cheer up, cheerily, cheer up" — a liquid rolling carol delivered from high canopy perches at dawn and twilight.
+            </p>
+          </div>
+
+          <!-- Habitat & Ecological Range -->
+          <div class="mb-3 bg-slate-950/80 p-2.5 rounded-xl border border-slate-800">
+            <h3 class="text-xs font-bold text-emerald-400 flex items-center gap-1.5 mb-1 font-mono uppercase">
+              <span>🌲</span> Habitat & Field Sightings
+            </h3>
+            <p id="birdHabitat" class="text-xs text-slate-200 leading-relaxed font-sans">
+              Forest edges, open oak-hickory woodlands, suburban parks, river bottoms, and montane pine savannas.
+            </p>
+          </div>
+
+          <!-- Pokédex Biological Fact -->
+          <div class="mb-3 bg-slate-950/80 p-2.5 rounded-xl border border-slate-800">
+            <h3 class="text-xs font-bold text-cyan-400 flex items-center gap-1.5 mb-1 font-mono uppercase">
+              <span>💡</span> Pokédex Biological Trivia
+            </h3>
+            <p id="birdFunFact" class="text-xs text-slate-200 leading-relaxed font-sans">
+              Robins can hear earthworms moving underground by cocking their heads to align their ears toward subterranean vibrations!
+            </p>
+          </div>
+
+          <!-- Database Reference Citations -->
+          <div class="pt-2 border-t border-slate-800/80 flex flex-wrap items-center gap-2 text-[11px] font-mono">
+            <span class="text-slate-400 text-[10px]">Citations & Databases:</span>
+            <a id="linkEbird" href="https://ebird.org/species/amerob" target="_blank" class="text-emerald-400 hover:underline flex items-center gap-1 bg-slate-800 px-2 py-0.5 rounded border border-slate-700">
+              eBird ↗
+            </a>
+            <a id="linkMacaulay" href="https://search.macaulaylibrary.org/catalog?taxonCode=amerob" target="_blank" class="text-yellow-400 hover:underline flex items-center gap-1 bg-slate-800 px-2 py-0.5 rounded border border-slate-700">
+              Macaulay Library ↗
+            </a>
+            <a id="linkXenoCanto" href="https://xeno-canto.org/explore?query=Turdus+migratorius" target="_blank" class="text-cyan-400 hover:underline flex items-center gap-1 bg-slate-800 px-2 py-0.5 rounded border border-slate-700">
+              Xeno-canto ↗
+            </a>
+          </div>
+
         </div>
-        <div id="sightingList" class="space-y-2 max-h-40 overflow-y-auto pr-1 text-xs text-slate-300">
-          <p class="text-forest-400 italic text-center py-3">No sightings logged on this trail yet.</p>
+
+
+        <!-- LOWER PART: BUTTONS CONSOLE (Recording, Media Uploads, Directory) -->
+        <div class="bg-slate-900/90 border-2 border-slate-800 rounded-2xl p-2.5 sm:p-3 shadow-xl shrink-0">
+          
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
+            
+            <!-- 1. Record 3 to 5 Seconds Audio -->
+            <button id="recordVoiceBtn" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold p-2.5 rounded-xl shadow transition flex flex-col items-center justify-center gap-1 active:scale-95 border border-emerald-400 text-xs">
+              <span id="recordBtnIcon" class="text-lg">🎙️</span>
+              <span id="recordBtnLabel" class="font-bold leading-tight">Record Voice (3-5s)</span>
+            </button>
+
+            <!-- 2. Submit Image or 5s Video Clip -->
+            <label for="mediaFileInput" class="cursor-pointer bg-cyan-700 hover:bg-cyan-600 text-white font-bold p-2.5 rounded-xl shadow transition flex flex-col items-center justify-center gap-1 active:scale-95 border border-cyan-400 text-center text-xs">
+              <span class="text-lg">📸</span>
+              <span class="font-bold leading-tight">Upload Image / Video</span>
+              <input type="file" id="mediaFileInput" accept="image/*,video/*" class="hidden">
+            </label>
+
+            <!-- 3. Upload Audio Voice File -->
+            <label for="audioFileInput" class="cursor-pointer bg-slate-800 hover:bg-slate-700 text-slate-100 font-bold p-2.5 rounded-xl shadow transition flex flex-col items-center justify-center gap-1 active:scale-95 border border-slate-600 text-center text-xs">
+              <span class="text-lg">📁</span>
+              <span class="font-bold leading-tight">Upload Bird Audio</span>
+              <input type="file" id="audioFileInput" accept="audio/*" class="hidden">
+            </label>
+
+            <!-- 4. Camera Live Snapshot -->
+            <button id="cameraSnapBtn" class="bg-slate-800 hover:bg-slate-700 text-slate-100 font-bold p-2 rounded-xl shadow transition flex items-center justify-center gap-1.5 active:scale-95 border border-slate-600 text-xs">
+              <span>📷</span> <span>Camera Snap</span>
+            </button>
+
+            <!-- 5. Random Wild Encounter -->
+            <button id="randomBirdBtn" class="bg-amber-600 hover:bg-amber-500 text-slate-950 font-bold p-2 rounded-xl shadow transition flex items-center justify-center gap-1.5 active:scale-95 border border-amber-400 text-xs">
+              <span>🎲</span> <span>Wild Encounter</span>
+            </button>
+
+            <!-- 6. Play Synthetic Voice Call -->
+            <button id="synthesizeCallBtn" class="bg-purple-700 hover:bg-purple-600 text-white font-bold p-2 rounded-xl shadow transition flex items-center justify-center gap-1.5 active:scale-95 border border-purple-500 text-xs">
+              <span>🔊</span> <span>Simulate Call</span>
+            </button>
+
+          </div>
+
+          <!-- Hidden Camera Video for Live Snapping -->
+          <video id="cameraLiveFeed" class="hidden"></video>
+
         </div>
+
       </div>
 
-    </section>
+    </div>
 
-  </main>
+  </div>
 
-  <!-- Touch Grass Full-screen Pocket Overlay -->
-  <div id="pocketOverlay" class="fixed inset-0 bg-forest-950/95 backdrop-blur-md z-50 flex flex-col items-center justify-center text-center p-6 transition-opacity duration-300 opacity-0 pointer-events-none">
-    <div class="max-w-md space-y-5">
-      <div class="text-7xl animate-bounce">🌲</div>
-      <h2 class="text-2xl font-black text-amber-gold">Phone in Pocket!</h2>
-      <p class="text-forest-200 text-sm leading-relaxed">
-        You're in nature! Listen to the rustle of leaves, look into the high branches, and enjoy the woods. TrailBird AI will notify you when a new bird vocalizes nearby.
-      </p>
-      <div class="p-4 rounded-xl bg-forest-900 border border-forest-700 text-xs font-mono text-forest-300">
-        🔊 Ambient Listening Mode: Active (Local Audio Watcher)
+
+  <!-- MODAL: POKÉDEX DIRECTORY (Search all 2,800+ bird species) -->
+  <div id="directoryModal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-slate-900 border-2 border-slate-700 rounded-3xl w-full max-w-4xl h-[85vh] flex flex-col p-4 sm:p-6 shadow-2xl overflow-hidden">
+      
+      <!-- Directory Header -->
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3 mb-3">
+        <div>
+          <h2 class="text-xl font-bold font-pokedex text-white flex items-center gap-2">
+            <span>📖</span> Avian Pokédex Directory
+          </h2>
+          <p class="text-xs text-slate-400">Search and discover all 2,867 classified bird species</p>
+        </div>
+        <button id="closeDirectoryBtn" class="w-8 h-8 rounded-full bg-slate-800 hover:bg-slate-700 text-white font-bold flex items-center justify-center border border-slate-600">
+          ✕
+        </button>
       </div>
-      <button id="resumeAppBtn" class="bg-forest-700 hover:bg-forest-600 text-white font-bold text-xs px-6 py-3 rounded-xl border border-forest-500 shadow-lg transition">
-        Resume Screen Display
-      </button>
+
+      <!-- Search & Filters -->
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 mb-3">
+        <input type="text" id="directorySearchInput" placeholder="Search by name, scientific binomial, family..." class="col-span-2 bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500">
+        <select id="familyFilterSelect" class="bg-slate-950 border border-slate-700 rounded-xl px-2 py-2 text-xs text-slate-200 focus:outline-none focus:border-cyan-500">
+          <option value="">All Families (Global)</option>
+        </select>
+      </div>
+
+      <!-- Scrollable List of Species -->
+      <div id="directoryList" class="flex-grow overflow-y-auto space-y-1.5 scrollable-info pr-1 min-h-0">
+        <!-- Rendered via app.js -->
+      </div>
+
+      <!-- Footer count -->
+      <div class="pt-2 mt-2 border-t border-slate-800 flex justify-between text-xs font-mono text-slate-400">
+        <span id="directoryResultsCount">Showing 2,867 species</span>
+        <span>Click any entry to load into Pokédex</span>
+      </div>
+
     </div>
   </div>
 
+  <!-- Main Application Script -->
   <script src="app.js"></script>
 </body>
 </html>

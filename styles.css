@@ -1,50 +1,125 @@
-/* Custom Styles for TrailBird AI */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap');
+/* TrailBird AI — Avian Pokédex Stylesheet */
+@import url('https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap');
+
+:root {
+  --pokedex-red: #dc2626;
+  --pokedex-dark-red: #991b1b;
+  --pokedex-bezel: #1e293b;
+  --pokedex-screen-bg: #030712;
+  --pokedex-screen-border: #374151;
+  --pokedex-cyan: #06b6d4;
+  --pokedex-amber: #f59e0b;
+  --pokedex-emerald: #10b981;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
 
 body {
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  background-color: #0b1317;
+  color: #f3f4f6;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden; /* Page must not be scrollable per user requirement */
+  user-select: none;
 }
 
-code, pre, .font-mono {
+.font-pokedex {
+  font-family: 'Chakra Petch', sans-serif;
+}
+
+.font-mono {
   font-family: 'JetBrains Mono', monospace;
 }
 
-/* Custom Scrollbar for Sighting Log */
-::-webkit-scrollbar {
+/* Custom Scrollbar for the Upper Text Information Box */
+.scrollable-info::-webkit-scrollbar {
   width: 6px;
-  height: 6px;
 }
-::-webkit-scrollbar-track {
-  background: #0c1e17;
+
+.scrollable-info::-webkit-scrollbar-track {
+  background: rgba(15, 23, 42, 0.7);
   border-radius: 4px;
 }
-::-webkit-scrollbar-thumb {
-  background: #275844;
+
+.scrollable-info::-webkit-scrollbar-thumb {
+  background: #334155;
   border-radius: 4px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: #489c7b;
+  border: 1px solid #475569;
 }
 
-/* Canvas styling */
-#spectrogramCanvas {
-  background-color: #0c1e17;
-  image-rendering: pixelated;
+.scrollable-info::-webkit-scrollbar-thumb:hover {
+  background: #06b6d4;
 }
 
-/* Active buttons */
-.active-sample {
-  border-color: #489c7b !important;
-  background-color: #1b3f31 !important;
-  color: #ffffff !important;
+/* LED Indicator Glows */
+.led-glow-blue {
+  box-shadow: 0 0 12px 3px rgba(6, 182, 212, 0.75);
 }
 
-/* Confidence Bar Animation */
-@keyframes growBar {
-  from { width: 0%; }
-  to { width: var(--target-width); }
+.led-glow-red {
+  box-shadow: 0 0 10px 2px rgba(239, 68, 68, 0.75);
 }
 
-.confidence-fill {
-  animation: growBar 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+.led-glow-amber {
+  box-shadow: 0 0 10px 2px rgba(245, 158, 11, 0.75);
+}
+
+.led-glow-green {
+  box-shadow: 0 0 10px 2px rgba(16, 185, 129, 0.75);
+}
+
+/* Glass Screen Effect */
+.pokedex-screen {
+  background: radial-gradient(circle at 50% 20%, #111827 0%, #030712 100%);
+  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.8), 0 1px 2px rgba(255, 255, 255, 0.1);
+}
+
+/* Slideshow animations */
+.slide-fade {
+  animation: fadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Audio Waveform Canvas */
+#waveformCanvas {
+  image-rendering: auto;
+}
+
+/* Pulse animation for recording */
+@keyframes recordingPulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.5;
+    transform: scale(1.05);
+  }
+}
+
+.recording-pulse {
+  animation: recordingPulse 1.2s infinite ease-in-out;
+}
+
+/* Responsive adjustments for portrait orientation */
+@media (orientation: portrait), (max-width: 768px) {
+  .pokedex-layout {
+    grid-template-columns: 1fr !important;
+    grid-template-rows: auto 1fr auto !important;
+  }
 }

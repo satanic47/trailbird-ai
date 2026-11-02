@@ -190,16 +190,19 @@ def main():
     if top_match:
         sp = top_match["species"]
         conf = top_match["confidence"]
-        print(f"🎯 TOP IDENTIFICATION: {sp['icon_emoji']} {sp['common_name']} ({sp['scientific_name']})")
+        icon = sp.get("icon_emoji", "🦅")
+        tip = sp.get("touch_grass_tip", f"Look up in {sp.get('habitat', 'canopy branches').lower()} to spot this species.")
+        pokedex_id = sp.get("pokedex_id", "")
+        print(f"🎯 TOP IDENTIFICATION: {pokedex_id} {icon} {sp['common_name']} ({sp['scientific_name']})")
         print(f"   Confidence:      {conf}%")
         print(f"   Family:          {sp['family']}")
         print(f"   Typical Call:    \"{sp['call_pattern']}\"")
         print(f"   Habitat:         {sp['habitat']}")
-        print(f"   Status:          {sp['conservation_status']}")
+        print(f"   Status:          {sp.get('conservation_status', 'Least Concern (LC)')}")
         print(f"   💡 Fun Fact:     {sp['fun_fact']}")
         print("=" * 64)
         print(f"🌿 TOUCH GRASS ACTION TIP:")
-        print(f"   👉 {sp['touch_grass_tip']}")
+        print(f"   👉 {tip}")
         print("   📢 Put your phone in your pocket and look up now!")
         print("=" * 64)
 
