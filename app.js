@@ -90,7 +90,10 @@ const cameraLiveFeed = document.getElementById('cameraLiveFeed');
 // -------------------------------------------------------------
 async function initApp() {
   try {
-    const resp = await fetch('models/species_db.json');
+    let resp = await fetch('/static/models/species_db.json');
+    if (!resp.ok) {
+      resp = await fetch('models/species_db.json');
+    }
     const data = await resp.json();
     speciesDB = data.species || [];
     headerTotalSpecies.textContent = (data.total_species || speciesDB.length).toLocaleString();
@@ -171,6 +174,60 @@ function getEmergencyFallbackDB() {
 // -------------------------------------------------------------
 // 2. LOAD BIRD DATA INTO POKÉDEX UI
 // -------------------------------------------------------------
+
+// Dynamic Wikimedia & Wikipedia High-Resolution Species Image Resolver
+const speciesImageCache = new Map();
+
+async function fetchSpeciesImages(bird) {
+  if (!bird) return null;
+  const key = bird.id || bird.scientific_name;
+  if (speciesImageCache.has(key)) {
+    return speciesImageCache.get(key);
+  }
+
+  // If species already has verified curated images (e.g. Cornell Macaulay / Wikimedia), use them
+  if (bird.images && bird.images.length >= 3 && !bird.images[0].includes("unsplash.com")) {
+    speciesImageCache.set(key, bird.images);
+    return bird.images;
+  }
+
+  try {
+    const titles = [
+      (bird.common_name || "").replace(/ /g, "_"),
+      (bird.scientific_name || "").replace(/ /g, "_")
+    ];
+    for (const title of titles) {
+      if (!title) continue;
+      const res = await fetch(`https://en.wikipedia.org/api/rest_v1/page/media-list/${encodeURIComponent(title)}`);
+      if (res.ok) {
+        const data = await res.json();
+        const valid = [];
+        for (const item of (data.items || [])) {
+          if (item.type === "image") {
+            const t = (item.title || "").toLowerCase();
+            if (!t.includes(".svg") && !t.includes("map") && !t.includes("distrib") && !t.includes("icon") && !t.includes("logo") && !t.includes("sound") && !t.includes("pronunc")) {
+              const srcset = item.srcset || [];
+              let src = srcset.length ? srcset[srcset.length - 1].src : item.src;
+              if (src) {
+                if (src.startsWith("//")) src = "https:" + src;
+                valid.push(src);
+                if (valid.length >= 3) break;
+              }
+            }
+          }
+        }
+        if (valid.length >= 1) {
+          speciesImageCache.set(key, valid);
+          return valid;
+        }
+      }
+    }
+  } catch (err) {
+    console.debug("Dynamic species image lookup error:", err);
+  }
+  return null;
+}
+
 function loadBirdIntoPokedex(bird, confidence = 98.2) {
   if (!bird) return;
   currentSpecies = bird;
@@ -201,15 +258,31 @@ function loadBirdIntoPokedex(bird, confidence = 98.2) {
   linkMacaulay.href = bird.macaulay_url || `https://search.macaulaylibrary.org/catalog?taxonCode=${bird.species_code || ''}`;
   linkXenoCanto.href = bird.xeno_canto_url || `https://xeno-canto.org/explore?query=${encodeURIComponent(bird.scientific_name)}`;
 
-  // Media Player - Slideshow Images (At least 3 realistic images)
-  slideshowImages = (bird.images && bird.images.length >= 3) ? bird.images : [
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b8/Turdus-migratorius-002.jpg/800px-Turdus-migratorius-002.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/7/77/American_Robin_%28Turdus_migratorius%29_-_Guelph%2C_Ontario.jpg/800px-American_Robin_%28Turdus_migratorius%29_-_Guelph%2C_Ontario.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/3/36/Turdus_migratorius_-Woodland_Park_Zoo%2C_Seattle%2C_Washington%2C_USA-8a.jpg/800px-Turdus_migratorius_-Woodland_Park_Zoo%2C_Seattle%2C_Washington%2C_USA-8a.jpg"
-  ];
-  slideCountTotal.textContent = slideshowImages.length;
-  currentSlideIndex = 0;
-  displaySlide(currentSlideIndex);
+  // Stop any active audio and reset buffer
+  stopAudioPlayback();
+  audioBuffer = null;
+
+  // Media Player - Prioritize verified species images & initiate async Wikipedia image enhancement
+  if (bird.images && bird.images.length >= 1 && !bird.images[0].includes("unsplash.com")) {
+    slideshowImages = [...bird.images];
+    slideCountTotal.textContent = slideshowImages.length;
+    currentSlideIndex = 0;
+    displaySlide(0);
+  } else {
+    slideshowImages = [];
+    slideCountTotal.textContent = "3";
+    renderFallbackBirdIllustration(bird, 0);
+  }
+
+  // Dynamically resolve authentic high-res Wikipedia/Macaulay photos
+  fetchSpeciesImages(bird).then(resolved => {
+    if (resolved && resolved.length > 0 && currentSpecies && currentSpecies.id === bird.id) {
+      slideshowImages = resolved;
+      slideCountTotal.textContent = slideshowImages.length;
+      currentSlideIndex = 0;
+      displaySlide(0);
+    }
+  });
 
   // Status and Metrics
   audioPeakHz.textContent = `${bird.dominant_freq_hz.toLocaleString()} Hz`;
@@ -262,56 +335,95 @@ function displaySlide(index) {
 }
 
 function renderFallbackBirdIllustration(bird, slideIndex) {
-  slideshowImg.classList.add('hidden');
-  slideshowCanvas.classList.remove('hidden');
-  const ctx = slideshowCanvas.getContext('2d');
+  slideshowImg.classList.add("hidden");
+  slideshowCanvas.classList.remove("hidden");
+  const ctx = slideshowCanvas.getContext("2d");
   slideshowCanvas.width = slideshowCanvas.parentElement.clientWidth || 400;
   slideshowCanvas.height = slideshowCanvas.parentElement.clientHeight || 300;
 
-  // Background
+  // Cybernetic biometric scanner background
   const grad = ctx.createLinearGradient(0, 0, 0, slideshowCanvas.height);
-  grad.addColorStop(0, '#0f172a');
-  grad.addColorStop(1, '#020617');
+  grad.addColorStop(0, "#030712");
+  grad.addColorStop(1, "#090d16");
   ctx.fillStyle = grad;
   ctx.fillRect(0, 0, slideshowCanvas.width, slideshowCanvas.height);
 
-  // Decorative grid lines
-  ctx.strokeStyle = 'rgba(6, 182, 212, 0.15)';
+  // High-tech telemetry grid
+  ctx.strokeStyle = "rgba(6, 182, 212, 0.12)";
   ctx.lineWidth = 1;
-  for (let x = 0; x < slideshowCanvas.width; x += 30) {
+  for (let x = 0; x < slideshowCanvas.width; x += 25) {
     ctx.beginPath();
     ctx.moveTo(x, 0);
     ctx.lineTo(x, slideshowCanvas.height);
     ctx.stroke();
   }
-  for (let y = 0; y < slideshowCanvas.height; y += 30) {
+  for (let y = 0; y < slideshowCanvas.height; y += 25) {
     ctx.beginPath();
     ctx.moveTo(0, y);
     ctx.lineTo(slideshowCanvas.width, y);
     ctx.stroke();
   }
 
-  // Draw Stylized Pokédex Hologram Bird
   const cx = slideshowCanvas.width / 2;
-  const cy = slideshowCanvas.height / 2 - 10;
-  
-  ctx.fillStyle = '#06b6d4';
-  ctx.font = 'bold 16px "Chakra Petch", sans-serif';
-  ctx.textAlign = 'center';
-  ctx.fillText(bird ? bird.common_name : "Avian Subject", cx, cy - 40);
+  const cy = slideshowCanvas.height / 2 - 5;
 
-  ctx.fillStyle = '#94a3b8';
+  // Concentric radar targeting reticle
+  ctx.strokeStyle = "rgba(6, 182, 212, 0.4)";
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  ctx.arc(cx, cy, 65, 0, Math.PI * 2);
+  ctx.stroke();
+
+  ctx.strokeStyle = "rgba(16, 185, 129, 0.3)";
+  ctx.setLineDash([4, 6]);
+  ctx.beginPath();
+  ctx.arc(cx, cy, 45, 0, Math.PI * 2);
+  ctx.stroke();
+  ctx.setLineDash([]);
+
+  // Crosshairs
+  ctx.strokeStyle = "rgba(6, 182, 212, 0.35)";
+  ctx.beginPath();
+  ctx.moveTo(cx - 80, cy);
+  ctx.lineTo(cx + 80, cy);
+  ctx.moveTo(cx, cy - 80);
+  ctx.lineTo(cx, cy + 80);
+  ctx.stroke();
+
+  // Taxonomic Order Icon
+  let orderIcon = "🦅";
+  const ord = bird ? (bird.order || "") : "";
+  if (ord === "Struthioniformes" || ord === "Casuariiformes" || ord === "Rheiformes") orderIcon = "🦤";
+  else if (ord === "Strigiformes") orderIcon = "🦉";
+  else if (ord === "Anseriformes") orderIcon = "🦆";
+  else if (ord === "Psittaciformes") orderIcon = "🦜";
+  else if (ord === "Columbiformes") orderIcon = "🕊️";
+  else if (ord === "Sphenisciformes") orderIcon = "🐧";
+  else if (ord === "Passeriformes") orderIcon = "🐦";
+
+  ctx.font = "40px sans-serif";
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  ctx.fillText(orderIcon, cx, cy);
+
+  // Species Labels
+  ctx.fillStyle = "#38bdf8";
+  ctx.font = 'bold 15px "Chakra Petch", sans-serif';
+  ctx.fillText(bird ? bird.common_name : "Avian Subject", cx, cy - 85);
+
+  ctx.fillStyle = "#94a3b8";
   ctx.font = 'italic 12px serif';
-  ctx.fillText(bird ? bird.scientific_name : "", cx, cy - 20);
+  ctx.fillText(bird ? bird.scientific_name : "", cx, cy - 65);
 
-  // Bird Silhouette / Iconic Glyph
-  ctx.font = '64px sans-serif';
-  ctx.fillText('🦅', cx, cy + 40);
+  ctx.fillStyle = "#34d399";
+  ctx.font = '10px "JetBrains Mono", monospace';
+  ctx.fillText(`BIOMETRIC TARGET • ACOUSTIC PEAK: ${(bird ? bird.dominant_freq_hz : 3000)} Hz`, cx, cy + 82);
 
-  ctx.fillStyle = '#38bdf8';
-  ctx.font = '11px "JetBrains Mono", monospace';
-  ctx.fillText(`OFFLINE SLIDE VIEW ${slideIndex + 1} OF 3`, cx, cy + 85);
+  ctx.fillStyle = "#64748b";
+  ctx.font = '9px "JetBrains Mono", monospace';
+  ctx.fillText(`FETCHING LIVE CORNELL & WIKIMEDIA PHOTOMETRY...`, cx, cy + 100);
 }
+
 
 // -------------------------------------------------------------
 // 4. AUDIO VOICE RECORDER (3 to 5 Seconds) & DETECTION
@@ -608,34 +720,118 @@ function toggleAudioPlayback() {
   }
 }
 
-// Web Audio API Avian Call Synthesizer (Realistic bird chirping)
+// Web Audio API Avian Call Synthesizer & Macaulay Library Streamer
 function synthesizeSpeciesCall(bird) {
   if (!bird) return;
   initAudioContext();
   stopAudioPlayback();
 
+  // 1. If species has a verified Macaulay Library or Wikimedia direct audio URL, stream authentic call
+  if (bird.audio_url) {
+    playerStatusBadge.textContent = "STREAMING AUDIO...";
+    fetch(bird.audio_url)
+      .then(res => {
+        if (!res.ok) throw new Error("Audio HTTP status " + res.status);
+        return res.arrayBuffer();
+      })
+      .then(ab => audioCtx.decodeAudioData(ab))
+      .then(decoded => {
+        audioBuffer = decoded;
+        playLoadedAudioBuffer(decoded);
+        playerStatusBadge.textContent = "IDENTIFIED";
+      })
+      .catch(err => {
+        console.warn("Direct Macaulay audio stream blocked, using taxonomic acoustic synthesizer:", err);
+        synthesizeTaxonomicAudio(bird);
+      });
+    return;
+  }
+
+  // 2. Synthesize call based on order-specific acoustic profile
+  synthesizeTaxonomicAudio(bird);
+}
+
+function synthesizeTaxonomicAudio(bird) {
   const duration = 3.5;
   const sampleRate = audioCtx.sampleRate;
   const newBuffer = audioCtx.createBuffer(1, sampleRate * duration, sampleRate);
   const data = newBuffer.getChannelData(0);
 
   const baseFreq = bird.dominant_freq_hz || 3200;
-  const minFreq = bird.freq_min_hz || 2200;
-  const maxFreq = bird.freq_max_hz || 4500;
+  const minFreq = bird.freq_min_hz || Math.round(baseFreq * 0.7);
+  const maxFreq = bird.freq_max_hz || Math.round(baseFreq * 1.4);
+  const order = bird.order || "";
 
-  for (let i = 0; i < data.length; i++) {
-    const t = i / sampleRate;
-    // Multi-syllable bird warble pattern
-    const chirpCycle = (t % 0.45);
-    const freqSweep = minFreq + (maxFreq - minFreq) * Math.sin(Math.PI * (chirpCycle / 0.45));
-    const envelope = Math.sin(Math.PI * (chirpCycle / 0.45)) * Math.exp(-chirpCycle * 3);
-    const harmonic = 0.7 * Math.sin(2 * Math.PI * freqSweep * t) + 0.3 * Math.sin(4 * Math.PI * freqSweep * t);
-    data[i] = harmonic * Math.max(0, envelope) * 0.7;
+  // 1. Ratites / Ostriches / Emus / Cassowaries (Deep sub-bass booming roar & guttural hiss)
+  if (baseFreq < 220 || order === "Struthioniformes" || order === "Casuariiformes" || order === "Rheiformes") {
+    for (let i = 0; i < data.length; i++) {
+      const t = i / sampleRate;
+      const cycle = t % 1.2;
+      const env = Math.exp(-cycle * 3.2) * Math.sin(Math.min(Math.PI, cycle * 3.5));
+      const boom = Math.sin(2 * Math.PI * baseFreq * t) + 
+                   0.45 * Math.sin(2 * Math.PI * (baseFreq * 2) * t) + 
+                   0.25 * Math.sin(2 * Math.PI * (baseFreq * 0.5) * t);
+      const hiss = (Math.random() * 2 - 1) * 0.08;
+      data[i] = (boom + hiss) * Math.max(0, env) * 0.95;
+    }
+  }
+  // 2. Owls (Hollow resonant "hoo-hoo" pulses)
+  else if (order === "Strigiformes" || baseFreq < 450) {
+    for (let i = 0; i < data.length; i++) {
+      const t = i / sampleRate;
+      const cycle = t % 0.85;
+      const env = Math.sin(Math.PI * (cycle / 0.85)) * Math.exp(-cycle * 2.2);
+      const hoot = Math.sin(2 * Math.PI * baseFreq * t) + 0.3 * Math.sin(4 * Math.PI * baseFreq * t);
+      data[i] = hoot * Math.max(0, env) * 0.85;
+    }
+  }
+  // 3. Doves & Pigeons (Rhythmic mellow "coo-coo")
+  else if (order === "Columbiformes" || baseFreq < 900) {
+    for (let i = 0; i < data.length; i++) {
+      const t = i / sampleRate;
+      const cycle = t % 0.65;
+      const env = Math.sin(Math.PI * (cycle / 0.65)) * Math.exp(-cycle * 3.0);
+      const coo = Math.sin(2 * Math.PI * baseFreq * t) + 0.2 * Math.sin(4 * Math.PI * baseFreq * t);
+      data[i] = coo * Math.max(0, env) * 0.8;
+    }
+  }
+  // 4. Corvidae / Crows / Jays (Harsh grating caws with AM rasp)
+  else if (order === "Passeriformes" && (bird.family || "").includes("Corvidae")) {
+    for (let i = 0; i < data.length; i++) {
+      const t = i / sampleRate;
+      const cycle = t % 0.65;
+      const env = Math.sin(Math.PI * (cycle / 0.65)) * Math.exp(-cycle * 2.0);
+      const am = 1 + 0.5 * Math.sin(2 * Math.PI * 45 * t);
+      const caw = (Math.sin(2 * Math.PI * baseFreq * t) + 0.35 * (Math.random() * 2 - 1)) * am;
+      data[i] = caw * Math.max(0, env) * 0.65;
+    }
+  }
+  // 5. Hummingbirds (Ultra-fast high frequency buzzing and sharp chirps)
+  else if (order === "Apodiformes" || baseFreq > 5500) {
+    for (let i = 0; i < data.length; i++) {
+      const t = i / sampleRate;
+      const cycle = t % 0.15;
+      const env = Math.sin(Math.PI * (cycle / 0.15));
+      const buzz = Math.sin(2 * Math.PI * baseFreq * t) * (1 + 0.5 * Math.sin(2 * Math.PI * 180 * t));
+      data[i] = buzz * Math.max(0, env) * 0.5;
+    }
+  }
+  // 6. Songbirds & Passerines (Intricate melodic frequency warbles & sweeps)
+  else {
+    for (let i = 0; i < data.length; i++) {
+      const t = i / sampleRate;
+      const chirpCycle = (t % 0.45);
+      const freqSweep = minFreq + (maxFreq - minFreq) * Math.sin(Math.PI * (chirpCycle / 0.45));
+      const envelope = Math.sin(Math.PI * (chirpCycle / 0.45)) * Math.exp(-chirpCycle * 3);
+      const harmonic = 0.7 * Math.sin(2 * Math.PI * freqSweep * t) + 0.3 * Math.sin(4 * Math.PI * freqSweep * t);
+      data[i] = harmonic * Math.max(0, envelope) * 0.75;
+    }
   }
 
   audioBuffer = newBuffer;
   playLoadedAudioBuffer(newBuffer);
 }
+
 
 // Waveform and Spectrogram Visualizer Loop
 function renderWaveformVisualizer() {
